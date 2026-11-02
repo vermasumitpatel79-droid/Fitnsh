@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7557df">
+<title>Fitnsh — Move well. Live well.</title>
+<style>
+:root{--purple:#7557df;--deep:#4d36a8;--ink:#24213a;--muted:#77738d;--bg:#f6f4ff;--card:#fff;--line:#ece9f7;--mint:#dff7ee}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{background:linear-gradient(135deg,#8066ed,#5b42bd);color:white;padding:26px 20px 30px;border-radius:0 0 28px 28px}
+.top{display:flex;justify-content:space-between;align-items:center}.logo{font-weight:850;font-size:25px;letter-spacing:.3px}.tag{font-size:12px;opacity:.9}
+h1{font-size:25px;line-height:1.2;margin:24px 0 7px}header p{margin:0;font-size:14px;opacity:.9}
+main{max-width:680px;margin:auto;padding:18px 16px 38px}.section-title{font-size:17px;margin:22px 2px 12px;font-weight:800}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:16px;box-shadow:0 5px 18px #4430800b}
+.metric{font-size:26px;font-weight:850;margin:6px 0}.small{font-size:12px;color:var(--muted)}.icon{font-size:22px}
+button{border:0;background:var(--purple);color:#fff;padding:11px 14px;border-radius:12px;font-weight:750;font-size:13px;cursor:pointer}
+button.secondary{background:#eeeaff;color:var(--deep)}button:active{transform:scale(.98)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.progress{height:9px;background:#eeeaf8;border-radius:20px;overflow:hidden;margin:10px 0}.bar{height:100%;background:linear-gradient(90deg,#927cf1,#5f45c4);width:0%}
+.timer{text-align:center;padding:8px}.time{font-size:42px;font-weight:850;letter-spacing:1px;margin:6px 0 12px}
+input{width:62px;padding:8px;border:1px solid var(--line);border-radius:10px;font:inherit}
+.task{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.task:last-child{border:0}.task input{width:18px;height:18px;accent-color:var(--purple)}
+footer{text-align:center;color:var(--muted);font-size:11px;margin:24px 0 0}
+@media(max-width:380px){.grid{grid-template-columns:1fr}.metric{font-size:24px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><div class="logo">fitnsh<span style="color:#d9d0ff">.</span></div><div class="tag">YOUR DAILY WELLNESS SPACE</div></div>
+ <h1>Small steps.<br>Better everyday.</h1>
+ <p>Move a little, focus a little, feel your progress.</p>
+</header>
+<main>
+ <div class="section-title">Your day at a glance</div>
+ <div class="grid">
+  <div class="card"><div class="icon">💧</div><div class="small">Water today</div><div class="metric"><span id="water">0</span> / 8</div><div class="progress"><div class="bar" id="waterbar"></div></div><button onclick="addWater()">+ Add glass</button></div>
+  <div class="card"><div class="icon">⏱️</div><div class="small">Focus session</div><div class="metric" id="focusTotal">0 min</div><div class="small">Time spent focusing today</div><button class="secondary" onclick="resetFocus()">Reset today</button></div>
+ </div>
+ <div class="section-title">Focus timer</div>
+ <div class="card timer">
+  <div class="small">A calm session for study, reading or a break</div>
+  <div class="time" id="clock">25:00</div>
+  <div class="row" style="justify-content:center;flex-wrap:wrap">
+   <button id="start" onclick="toggleTimer()">Start</button>
+   <button class="secondary" onclick="setTimer(25)">25 min</button>
+   <button class="secondary" onclick="setTimer(5)">5 min</button>
+   <button class="secondary" onclick="resetTimer()">Reset</button>
+  </div>
+ </div>
+ <div class="section-title">Today's movement</div>
+ <div class="card">
+  <div class="task"><input type="checkbox" class="move"> <span>5-minute gentle warm-up</span></div>
+  <div class="task"><input type="checkbox" class="move"> <span>10-minute walk or easy movement</span></div>
+  <div class="task"><input type="checkbox" class="move"> <span>Stretch and relax</span></div>
+  <div class="small" style="margin-top:10px">Choose comfortable movement and take breaks whenever needed.</div>
+ </div>
+ <div class="section-title">Daily reminder</div>
+ <div class="card" style="background:var(--mint);border:0">
+  <div style="font-weight:800">🌱 Progress, not perfection</div>
+  <div class="small" style="color:#426b5e;margin-top:5px">Drink water when thirsty, get enough rest, and make time to move in a way that feels good.</div>
+ </div>
+ <footer>Fitnsh is a personal habit tracker, not a medical or diagnostic tool.</footer>
+</main>
+<script>
+let waterCount=Number(localStorage.getItem('fitnsh-water')||0);
+let focusMinutes=Number(localStorage.getItem('fitnsh-focus')||0);
+function render(){document.getElementById('water').textContent=waterCount;document.getElementById('waterbar').style.width=Math.min(100,waterCount/8*100)+'%';document.getElementById('focusTotal').textContent=focusMinutes+' min'}
+function addWater(){waterCount=Math.min(99,waterCount+1);localStorage.setItem('fitnsh-water',waterCount);render()}
+let seconds=1500,remaining=1500,interval=null,running=false;
+function show(){document.getElementById('clock').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0')}
+function setTimer(min){pause();seconds=min*60;remaining=seconds;show()}
+function pause(){if(interval)clearInterval(interval);interval=null;running=false;document.getElementById('start').textContent='Start'}
+function toggleTimer(){if(running){pause();return}running=true;document.getElementById('start').textContent='Pause';interval=setInterval(()=>{remaining--;show();if(remaining<=0){pause();if(seconds===1500){focusMinutes+=25;localStorage.setItem('fitnsh-focus',focusMinutes);render()}alert('Session complete. Take a short break!')}},1000)}
+function resetTimer(){pause();remaining=seconds;show()}
+function resetFocus(){focusMinutes=0;localStorage.setItem('fitnsh-focus',0);render()}
+render();show();
+</script>
+</body>
+</html>
